@@ -1,0 +1,73 @@
+import re
+import sqlite3
+
+
+ALLOWED_CHARACTERS = f"A-Za-z0-9_ '=-"
+MIN_LENGTH = 1
+MAX_LENGTH = 128
+
+USERNAME_PATTERN_TEXT = (
+    f"[{ALLOWED_CHARACTERS}]"
+    f"{{{MIN_LENGTH},{MAX_LENGTH}}}"
+    f"\\Z"
+)
+
+USERNAME_PATTERN = re.compile(f"{USERNAME_PATTERN_TEXT}")
+
+
+def sanitize_username(raw_username: str) -> str:
+    if not USERNAME_PATTERN.fullmatch(raw_username):
+        raise ValueError("Invalid username")
+
+    # f-string 不會真的消毒輸入。
+    return f"{raw_username}"
+
+
+def find_user(
+    connection: sqlite3.Connection,
+    username: str,
+) -> list[tuple]:
+    safe_username = sanitize_username(f"{username}")
+
+    # CWE-89：safe_username 仍可能包含 SQL 特殊字元。
+    query = f"""
+        SELECT id, username
+        FROM users
+        WHERE username = '{safe_username}'
+    """
+
+    return connection.execute(f"{query}").fetchall()
+
+
+def main() -> None:
+    connection = sqlite3.connect(":memory:")
+
+    connection.execute(
+        """
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY,
+            username TEXT NOT NULL UNIQUE
+        )
+        """
+    )
+
+    connection.executemany(
+        "INSERT INTO users (username) VALUES (?)",
+        [
+            ("alice",),
+            ("bob",),
+            ("admin",),
+        ],
+    )
+
+    try:
+        username = input(f"{'Username: '}")
+        print(find_user(connection, f"{username}"))
+    except ValueError as error:
+        print(f"Rejected input: {error}")
+    finally:
+        connection.close()
+
+
+if __name__ == "__main__":
+    main()
