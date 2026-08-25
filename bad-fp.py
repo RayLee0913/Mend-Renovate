@@ -30,9 +30,9 @@ if __name__ == "__main__":
     table_name = input("table name > ")
 
     try:
-        int(table_name)
-        if len(table_name) <= 5:
-            SELECT_ALL_FROM_TABLE(table_name)
+        TB = str(int(table_name))
+        if len(TB) <= 5:
+            SELECT_ALL_FROM_TABLE(TB)
         else:
             print("Table name is too long. Please enter a table name with 5 or fewer characters.")
     except ValueError:
