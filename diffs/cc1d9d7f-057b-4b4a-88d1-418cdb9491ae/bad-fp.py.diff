@@ -1,0 +1,45 @@
+ import mysql.connector
+ 
+ def SELECT_ALL_FROM_TABLE(table_name):
+ 
+-    query = f"SELECT * FROM {table_name}"
++    query = "SELECT * FROM %s"
+ 
+     conn = mysql.connector.connect(
+         host="127.0.0.1",
+         user="testuser",
+-        password="TestPassw0rd!",
+-        database="testdb",
+-        port=3306,
+-        autocommit=True
++        password="TestPassw0rd!"
+     )
+ 
+     cursor = conn.cursor()
+ 
+-    cursor.execute(query)
++    cursor.execute(query, (table_name,))
+ 
+     # print
+     rows = cursor.fetchall()
+ 
+     for row in rows:
+         print(row)
+ 
+     cursor.close()
+     conn.close()
+ 
+ if __name__ == "__main__":
+     table_name = input("table name > ")
+ 
+     try:
+         int(table_name)
+         if len(table_name) <= 5:
+             SELECT_ALL_FROM_TABLE(table_name)
+         else:
+             print("Table name is too long. Please enter a table name with 5 or fewer characters.")
+     except ValueError:
+         print("Invalid input. Please enter a valid table name.")
+ 
+ 
+ 
