@@ -1,5 +1,6 @@
 import mysql.connector
 
+## Define Function
 def SELECT_ALL_FROM_TABLE(table_name):
 
     query = f"SELECT * FROM {table_name}"
@@ -37,6 +38,3 @@ if __name__ == "__main__":
             print("Table name is too long. Please enter a table name with 5 or fewer characters.")
     except ValueError:
         print("Invalid input. Please enter a valid table name.")
-
-
-
