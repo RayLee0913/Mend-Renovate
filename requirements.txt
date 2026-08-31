@@ -1,2 +1,2 @@
 keyboard
-Django==3.2.21
+Django==5.2.16
